@@ -3,35 +3,18 @@ import requests
 from bs4 import BeautifulSoup
 
 
-def find_player_info():
-    # Find the <td> element with class 'left' containing the player's name
-    i = 0
+def find_player_info(start_index, end_index):
     player = []
-    for i in range(0, 3):
+    for i in range(start_index, end_index):
         player_name_tag = soup.find_all('td', class_='left')[i].find('a')
         player.append(player_name_tag.text.strip()
                       if player_name_tag else 'Unknown Player')
-        i = +1
-    player_rating_tag = soup.find('td', class_='selected c0')
+    if start_index > 2:
+        player_rating_tag = soup.find_all('td', class_='selected c0')[1]
+    else:
+        player_rating_tag = soup.find('td', class_='selected c0')
     player_rating = player_rating_tag.text if player_rating_tag else 'Unknown Rating'
     player.append(int(player_rating))
-
-    return player
-
-
-# This function retrieves names and ratings of players playing as center-backs.
-def find_player_info2():
-    i = 3
-    player = []
-    for i in range(3, 6):
-        player_name_tag = soup.find_all('td', class_='left')[i].find('a')
-        player.append(player_name_tag.text.strip()
-                      if player_name_tag else 'Unknown Player')
-        i = +1
-    player_rating_tag = soup.find_all('td', class_='selected c0')[1]
-    player_rating = player_rating_tag.text if player_rating_tag else 'Unknown Rating'
-    player.append(int(player_rating))
-
     return player
 
 
@@ -58,9 +41,17 @@ def semifinal(country1, country2, sum_country1, sum_country2):
 def final(final_team1, final_team2, sum_finalist1, sum_finalist2):
     while True:
         if sum_finalist1 > sum_finalist2:
+            print(
+                f"{final_team1} - Sum rating after another modifying: {sum_finalist1}")
+            print(
+                f"{final_team2} - Sum rating after another modifying: {sum_finalist2}")
             print(f"\nWinner is {final_team1}!")
             break
         elif sum_finalist1 < sum_finalist2:
+            print(
+                f"{final_team1} - Sum rating after another modifying: {sum_finalist1}")
+            print(
+                f"{final_team2} - Sum rating after another modifying: {sum_finalist2}")
             print(f"\nWinner is {final_team2}!")
             break
         else:
@@ -76,25 +67,18 @@ players = []
 for teams in countries:  # Iterates through countries to fetch web pages for player information from different national teams
     for i in [0, 1, 2, 3, 4, 5, 8, 9, 10, 12]:
         url = f"https://pesdb.net/efootball/?nationality={teams}&pos={i}"
-        response = requests.get(url)
-        if ((response.status_code == 200) and (i == 1)):
+        try:
+            response = requests.get(url)
+            response.raise_for_status()
             soup = BeautifulSoup(response.content, 'html.parser')
-            player_info = find_player_info()
-            players.append(player_info)
-            player_info = find_player_info2()
-            players.append(player_info)
-
-        elif response.status_code == 200:
-            # Parse the HTML content of the page
-            soup = BeautifulSoup(response.content, 'html.parser')
-
-            # append the players info to new list
-            player_info = find_player_info()
-            players.append(player_info)
-
-        else:
+            if i == 1:
+                players.append(find_player_info(0, 3))
+                players.append(find_player_info(3, 6))
+            else:
+                players.append(find_player_info(0, 3))
+        except requests.HTTPError as e:
             print(f"Failed to retrieve the page. Status code: {
-                response.status_code}")
+                  response.status_code}. Error: {e}")
 
 players_by_country = {}
 
@@ -152,7 +136,6 @@ sum_finalist2 = round(
     sum_rating_by_country[final_team2] * random.uniform(0.85, 1.05))
 
 print(f"\nFinal: {final_team1} vs {final_team2}")
-print(f"{final_team1} - Sum rating after another modifying: {sum_finalist1}")
-print(f"{final_team2} - Sum rating after another modifying: {sum_finalist2}")
+
 
 final(final_team1, final_team2, sum_finalist1, sum_finalist2)
