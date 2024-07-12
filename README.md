@@ -10,7 +10,7 @@ This is my first major python project. The data for this simulator is downloaded
 - the possibility to create your own team
 - the player's form would be adjusted according to how he is doing in the real world
 ## Version 0.1.1
-I removed one fucntion that waa redundant and made the code cleaner.
+I removed one fucntion that was redundant and made the code cleaner.
 ## Version 0.1.0
 I wanted to finish this project before the start of the final match of the EURO, that's why it contains only basic features, on the other hand, the code is quite modular and adding new features shouldn't be that difficult.
 ### Features in this version:
