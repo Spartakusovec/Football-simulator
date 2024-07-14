@@ -9,6 +9,12 @@ This is my first major python project. The data for this simulator is downloaded
 - announcement of the best player of the tournament, but not just based on G/A, I want defensive players to have a chance as well
 - the possibility to create your own team
 - the player's form would be adjusted according to how he is doing in the real world
+
+# 0.2.1
+
+In this version, I completely redesigned the penalty shootout, also players now have a 70% chance of scoring a goal, a success rate similar to the real world.
+Fixed a bug where score in extra time would be set to 0:0
+
 # 0.2.0
 
 Changed the way the program works, chances on winning is now calculated on comparing random players against goalkeeper. Also there are now penalties, but I'm not really happy with it, i wanted to implement it so bad so I used a lot of copilots help, definitely will change it in following updates, but for now it's fine. 
