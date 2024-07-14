@@ -28,69 +28,70 @@ def find_player_info(start_index, end_index, position):
     return player
 
 
-def penalties(country1, country2, score1, score2, num):
-    attempts = 5 if num == 0 else 2
+def penalties(country1, country2, score1, score2):
 
-    for i in range(attempts):
-        if num == 0:
-            # První kolo penalt
-            penalty1 = random.random()
-            penalty2 = random.random()
+    for i in range(5):
+        print(f"\n{i+1} round of penalty shootout")
+        if random.random() > 0.3:
+            print(f"{country1} scores a penalty!")
+            score1 += 1
+        else:
+            # print(f"{country1} misses the penalty!")
+            pass
 
-            if penalty1 > penalty2:
-                score1 += 1
-                print(f"{country1} scores a penalty!")
-            elif penalty1 < penalty2:
-                score2 += 1
-                print(f"{country2} scores a penalty!")
-            else:
-                print("Both teams miss the penalty!")
+        if random.random() > 0.3:
+            print(f"{country2} scores a penalty!")
+            score2 += 1
+        else:
+            # print(f"{country2} misses the penalty!")
+            pass
 
-            # Kontrola rozdílu 2 gólů po prvním kole
-            if abs(score1 - score2) >= 2:
-                break
+        if score1 > score2 + (4 - i):
+            print(f"\n{country1} wins the match on penalties!")
+            print(f"and the score is {score1}-{score2}")
+            return country1
+        elif score2 > score1 + (4 - i):
+            print(f"\n{country2} wins the match on penalties!")
+            print(f"and the score is {score1}-{score2}")
+            return country2
 
-        if num == 1 or i == 1:
-            # Druhé kolo penalt (pokud je potřeba)
-            penalty1 = random.random()
-            penalty2 = random.random()
+    print("\nSudden death will follow")
+    # Additional kicks if necessary
+    while score1 == score2:
+        if random.random() > 0.3:
+            print(f"{country1} scores a penalty!")
+            score1 += 1
+        else:
+            # print(f"{country1} misses the penalty!")
+            pass
 
-            if penalty1 > penalty2:
-                score1 += 1
-                print(f"{country1} scores a penalty!")
-            elif penalty1 < penalty2:
-                score2 += 1
-                print(f"{country2} scores a penalty!")
-            else:
-                print("Both teams miss the penalty!")
-
-            # Kontrola rozdílu 2 gólů po druhém kole
-            if abs(score1 - score2) >= 2:
-                break
+        if random.random() > 0.3:
+            print(f"{country2} scores a penalty!")
+            score2 += 1
+        else:
+            # print(f"{country2} misses the penalty!")
+            pass
 
     if score1 > score2:
-        print(f"{country1} wins the match on penalties!")
+        print(f"\n{country1} wins the match on penalties!")
+        print(f"and the score is {score1}-{score2}")
         return country1
-    elif score1 < score2:
-        print(f"{country2} wins the match on penalties!")
-        return country2
     else:
-        print(
-            "The match ends in a draw even after penalties. Another round will be played.")
-        final_team = penalties(country1, country2, score1, score2, 1)
-        return final_team
+        print(f"\n{country2} wins the match on penalties!")
+        print(f"and the score is {score1}-{score2}")
+        return country2
 
 
 def calculate_goal_chance(rating):
-    base_chance = 0.2  # základní šance na gól (20 %)
+    base_chance = 0.175  # Default chance to score a goal (17,5 %)
     adjusted_chance = base_chance + (rating / 1000)
-    return min(1.0, adjusted_chance)  # šance nemůže být vyšší než 100 %
+    return min(1.0, adjusted_chance)   # Chance can't be higher than 100 %
 
 
 def calculate_save_chance(rating):
-    base_chance = 0.1  # základní šance na zabránění gólu (10 %)
+    base_chance = 0.1
     adjusted_chance = base_chance + (rating / 1000)
-    return min(1.0, adjusted_chance)  # šance nemůže být vyšší než 100 %
+    return min(1.0, adjusted_chance)
 
 
 def simulate_individual_match(player1, player2, minute):
@@ -105,11 +106,11 @@ def simulate_individual_match(player1, player2, minute):
             player_goals_stats[player_name] += 1
         else:
             player_goals_stats[player_name] = 1
-        return True  # Gól
+        return True  # Goal
     else:
         # print(f"{player2[1]} saves the shot from {
         #   player1[1]} in {minute} minute!")
-        return False  # Chycení
+        return False  # Saved shot
 
 
 def simulate_team_match(team1, team2, extra_time):
@@ -144,30 +145,34 @@ def semifinal(country1, country2, team1, team2):
     while True:
         if score1 > score2:
             final_team = country1
-            print(f"{country1} beats {country2} with a score of {
+            print(f"\n{country1} beats {country2} with a score of {
                 score1}-{score2} and advances to the final!")
             return final_team
         elif score1 < score2:
             final_team = country2
-            print(f"{country2} beats {country1} with a score of {
+            print(f"\n{country2} beats {country1} with a score of {
                 score2}-{score1} and advances to the final!")
             return final_team
         else:
-            print("The match ends in a draw. Extra time will be played.")
-            score1, score2 = simulate_team_match(team1, team2, 1)
+            print(f"\nThe match ends in a draw. Extra time will be played.")
+            et_score1, et_score2 = simulate_team_match(team1, team2, 1)
+            score1 += et_score1
+            score2 += et_score2
             if score1 > score2:
                 final_team = country1
-                print(f"{country1} beats {country2} with a score of {
+                print(f"\n{country1} beats {country2} with a score of {
                     score1}-{score2} and advances to the final!")
                 return final_team
             elif score1 < score2:
                 final_team = country2
-                print(f"{country2} beats {country1} with a score of {
+                print(f"\n{country2} beats {country1} with a score of {
                     score2}-{score1} and advances to the final!")
                 return final_team
             else:
                 break
-    final_team = penalties(country1, country2, score1, score2, 0)
+    print(
+        f"\nThe match ends in a draw after extra time with a score of {country1} {score1} - {score2} {country2}. Penalties will be played.")
+    final_team = penalties(country1, country2, score1, score2)
     return final_team
 
 
@@ -176,12 +181,12 @@ def final(final_team1, final_team2, team1, team2):
     while True:
         if score1 > score2:
             winner = final_team1
-            print(f"{final_team1} wins the final against {
+            print(f"\n{final_team1} wins the final against {
                 final_team2} with a score of {score1}-{score2}!")
             return winner
         elif score1 < score2:
             winner = final_team2
-            print(f"{final_team2} wins the final against {
+            print(f"\n{final_team2} wins the final against {
                 final_team1} with a score of {score2}-{score1}!")
             return winner
         else:
@@ -199,11 +204,13 @@ def final(final_team1, final_team2, team1, team2):
                 return winner
             else:
                 break
-    winner = penalties(final_team1, final_team2, score1, score2, 0)
+    print("\nThe match ends in a draw after extra time. Penalties will be played.")
+    winner = penalties(final_team1, final_team2, score1, score2)
+    print(f"{winner} wins the TITLE!")
 
 
 def print_player_statistics(player_stats):
-    # Seřazení hráčů podle počtu vstřelených gólů
+    # Sort the player statistics by the number of goals scored
     sorted_players = sorted(player_stats.items(),
                             key=lambda x: x[1], reverse=True)
     print("\nPlayer Statistics:")
